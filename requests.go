@@ -51,8 +51,8 @@ func getPrice(TokenBraer string) {
 		fmt.Println(err)
 		return
 	}
-	//fileName := `C:\PriceYUG\price.json`
-	fileName := `price.json`
+	fileName := `C:\PriceYUG\price.json`
+	//fileName := `price.json`
 	WriteToFile(body, fileName)
 }
 
@@ -89,7 +89,7 @@ func getDescr(TokenBraer string) {
 		return
 	}
 
-	//fileName := `C:\PriceYUG\price_descr.json`
-	fileName := `price_descr.json`
+	fileName := `C:\PriceYUG\price_descr.json`
+	//fileName := `price_descr.json`
 	WriteToFile(body, fileName)
 }
