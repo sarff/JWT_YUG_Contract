@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-func WriteToFile(TextToWrite []byte) {
-	fileName := `C:\PriceYUG\price.json` // for other system without path
+func WriteToFile(TextToWrite []byte, fileName string) {
+	//fileName := `C:\PriceYUG\price.json` // for other system without path
 	//var d = TextToWrite
 	err := ioutil.WriteFile(fileName, TextToWrite, 0666)
 	if err != nil {
@@ -51,5 +51,45 @@ func getPrice(TokenBraer string) {
 		fmt.Println(err)
 		return
 	}
-	WriteToFile(body)
+	//fileName := `C:\PriceYUG\price.json`
+	fileName := `price.json`
+	WriteToFile(body, fileName)
+}
+
+func getDescr(TokenBraer string) {
+
+	url := goDotEnvVariable("URL_PRICE_DESCR")
+	method := "POST"
+
+	payload := strings.NewReader(`{
+  		"cats": [` + goDotEnvVariable("CATS") + `],
+  		"lang": "RU"
+		}`)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, payload)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	req.Header.Add("Authorization", "Bearer "+TokenBraer)
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	//fileName := `C:\PriceYUG\price_descr.json`
+	fileName := `price_descr.json`
+	WriteToFile(body, fileName)
 }

@@ -58,6 +58,7 @@ func main() {
 			ErrorLogger.Println(err)
 		} else {
 			getPrice(ourToken)
+			getDescr(ourToken)
 		}
 	}
 
