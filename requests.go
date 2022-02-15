@@ -8,7 +8,7 @@ import (
 )
 
 func WriteToFile(TextToWrite []byte) {
-	fileName := "price.json"
+	fileName := `C:\PriceYUG\price.json` // for other system without path
 	//var d = TextToWrite
 	err := ioutil.WriteFile(fileName, TextToWrite, 0666)
 	if err != nil {
