@@ -1,18 +1,42 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"strconv"
 	"strings"
 )
+
+func download(url string, catalog string) {
+	fileName := catalog + "/" + url[strings.LastIndex(url, "/")+1:]
+	_, err := os.Stat(fileName)
+	if err != nil {
+		if os.IsNotExist(err) {
+			os.Mkdir(catalog, 0755)
+			output, err := os.Create(fileName)
+			defer output.Close()
+
+			response, err := http.Get(url)
+			if err != nil {
+				ErrorLogger.Println(err)
+				return
+			}
+			defer response.Body.Close()
+			io.Copy(output, response.Body)
+		}
+	}
+}
 
 func WriteToFile(TextToWrite []byte, fileName string) {
 	//fileName := `C:\PriceYUG\price.json` // for other system without path
 	//var d = TextToWrite
 	err := ioutil.WriteFile(fileName, TextToWrite, 0666)
 	if err != nil {
-		fmt.Println("write fail")
+		ErrorLogger.Println(err)
 	}
 	fmt.Println("write success")
 }
@@ -92,4 +116,19 @@ func getDescr(TokenBraer string) {
 	fileName := `C:\PriceYUG\price_descr.json`
 	//fileName := `price_descr.json`
 	WriteToFile(body, fileName)
+
+	var results Data
+	json.Unmarshal(body, &results)
+
+	for _, id := range results.Item.Goods {
+		//fmt.Println("id :", id.Id)
+		catalog := goDotEnvVariable("IMG_PATH") + strconv.Itoa(id.Id)
+		for _, pict := range id.Picture {
+			//fmt.Println("link :", pict)
+			download(pict, catalog)
+			//fmt.Println("file does not exist") // это_true
+		}
+
+	}
+
 }

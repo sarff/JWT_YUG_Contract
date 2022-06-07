@@ -20,6 +20,19 @@ type JWTVal struct {
 	Link string `json:"authToken"`
 }
 
+type Data struct {
+	Item Item `json:"content"`
+}
+
+type Item struct {
+	Goods []Goods `json:"goods"`
+}
+
+type Goods struct {
+	Id      int      `json:"id"`
+	Picture []string `json:"pictures"`
+}
+
 func init() {
 	//InfoLogger.Println("Starting the application...")
 	//InfoLogger.Println("Something noteworthy happened")
