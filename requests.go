@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// 2
 func download(url string, catalog string) {
 	fileName := catalog + "/" + url[strings.LastIndex(url, "/")+1:]
 	_, err := os.Stat(fileName)

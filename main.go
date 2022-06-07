@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// 1
 var (
 	WarningLogger *log.Logger
 	InfoLogger    *log.Logger
