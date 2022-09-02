@@ -173,9 +173,12 @@ func getDescr(TokenBraer string) {
 	for _, id := range results.Item.Goods {
 		//fmt.Println("id :", id.Id)
 		catalog := goDotEnvVariable("IMG_PATH") + strconv.Itoa(id.Id)
+		replacer := strings.NewReplacer("\\", "", "/", "", ",", "", " ", "", ".", "")
+		out := replacer.Replace(strconv.Itoa(id.Id))
+
 		for _, pict := range id.Picture {
 			//fmt.Println("link :", pict)
-			go download(pict, catalog)
+			go download(pict, catalog+out)
 			//fmt.Println("file does not exist") // это_true
 		}
 
