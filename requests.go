@@ -36,6 +36,9 @@ func download(url, catalog string) {
 	//Get the response bytes from the url
 	fileName := catalog + "/" + url[strings.LastIndex(url, "/")+1:]
 	fi, err := os.Stat(fileName)
+	if os.IsNotExist(err) {
+		os.Mkdir(catalog, 0755)
+	}
 	if Exists(fileName) {
 		if err == nil {
 			if fi.Size() < 1000 {
