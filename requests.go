@@ -11,50 +11,77 @@ import (
 	"strings"
 )
 
-// 2
-//func download(url string, catalog string) {
+//func download(url, catalog string) {
+//	//Get the response bytes from the url
 //	fileName := catalog + "/" + url[strings.LastIndex(url, "/")+1:]
-//	_, err := os.Stat(fileName)
-//	if err != nil {
-//		if os.IsNotExist(err) {
-//			os.Mkdir(catalog, 0755)
-//			output, err := os.Create(fileName)
-//			defer output.Close()
-//
-//			response, err := http.Get(url)
-//			if err != nil {
-//				ErrorLogger.Println(err)
-//				return
+//	fi, err := os.Stat(fileName)
+//	if os.IsNotExist(err) {
+//		os.Mkdir(catalog, 0755)
+//	}
+//	if Exists(fileName) {
+//		if err == nil {
+//			if fi.Size() < 1000 {
+//				os.Remove(fileName)
 //			}
-//			defer response.Body.Close()
-//			io.Copy(output, response.Body)
+//		}
+//	} else {
+//		//fi, err := os.Stat(fileName)
+//		//if err != nil {
+//		response, _ := http.Get(url)
+//
+//		defer response.Body.Close()
+//
+//		if response.StatusCode == 200 {
+//			//Create a empty file
+//			file, err := os.Create(fileName)
+//			if err != nil {
+//				fmt.Println(err)
+//			}
+//			defer file.Close()
+//
+//			//Write the bytes to the fiel
+//			io.Copy(file, response.Body)
+//
+//			fi, err := file.Stat()
+//			//fmt.Println(fmt.Sprintf("File: %s, size: %s", file, fi.Size()))
+//			if err == nil {
+//				if fi.Size() < 1000 && err == nil {
+//					//file.Close()
+//					os.Remove(fileName)
+//				}
+//			}
 //		}
 //	}
 //}
 
 func download(url, catalog string) {
+	fmt.Println(fmt.Sprintf("catalog: %s  url: %s", catalog, url))
 	//Get the response bytes from the url
-	fileName := catalog + "/" + url[strings.LastIndex(url, "/")+1:]
-	fi, err := os.Stat(fileName)
+	//fileName := catalog + "/" + url[strings.LastIndex(url, "/")+1:]
+	fileNmaeShort := catalog + "/" + replaceString(url[strings.LastIndex(url, "/")+1:])
+	fi, err := os.Stat(fileNmaeShort)
 	if os.IsNotExist(err) {
 		os.Mkdir(catalog, 0755)
 	}
-	if Exists(fileName) {
+	if Exists(fileNmaeShort) {
 		if err == nil {
 			if fi.Size() < 1000 {
-				os.Remove(fileName)
+				os.Remove(fileNmaeShort)
 			}
 		}
 	} else {
 		//fi, err := os.Stat(fileName)
 		//if err != nil {
+
 		response, _ := http.Get(url)
 
 		defer response.Body.Close()
 
 		if response.StatusCode == 200 {
 			//Create a empty file
-			file, err := os.Create(fileName)
+			// разбить файл и реплейснуть
+
+			file, err := os.Create(fileNmaeShort)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -68,7 +95,7 @@ func download(url, catalog string) {
 			if err == nil {
 				if fi.Size() < 1000 && err == nil {
 					//file.Close()
-					os.Remove(fileName)
+					os.Remove(fileNmaeShort)
 				}
 			}
 		}
@@ -175,16 +202,33 @@ func getDescr(TokenBraer string) {
 
 	for _, id := range results.Item.Goods {
 		//fmt.Println("id :", id.Id)
-		catalog := goDotEnvVariable("IMG_PATH") + strconv.Itoa(id.Id)
+		catalog := goDotEnvVariable("IMG_PATH")
 		replacer := strings.NewReplacer("\\", "", "/", "", ",", "", " ", "", ".", "")
 		out := replacer.Replace(strconv.Itoa(id.Id))
 
 		for _, pict := range id.Picture {
 			//fmt.Println("link :", pict)
-			go download(pict, catalog+out)
+			if pict != "" {
+				download(pict, catalog+out)
+			}
 			//fmt.Println("file does not exist") // это_true
 		}
 
+	}
+
+}
+
+func replaceString(str string) string {
+
+	replacer := strings.NewReplacer("\\", "", "/", "", ",", "", " ", "", ".", "")
+	//out = replacer.Replace(v.Code)
+	lenname := len(strings.Split(str, ".")) - 1
+	splitName := strings.SplitN(str, ".", lenname)
+	if lenname == 1 {
+		return str
+	} else {
+		out := replacer.Replace(splitName[0])
+		return out + splitName[1]
 	}
 
 }
